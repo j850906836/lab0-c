@@ -12,8 +12,12 @@
 queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
-    /* TODO: What if malloc returned NULL? */
-    q->head = NULL;
+    if (q == NULL) {
+        printf("No Enough Space\n");
+    } else { /* What if malloc returned NULL? */
+        q->head = NULL;
+        q->tail = NULL;
+    }
     return q;
 }
 
