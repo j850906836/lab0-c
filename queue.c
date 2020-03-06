@@ -1,9 +1,10 @@
+#include "queue.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "harness.h"
-#include "queue.h"
 
 /*
  * Create empty queue.
@@ -24,11 +25,17 @@ queue_t *q_new()
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    q->head = NULL;
-    q->tail = NULL;
-    /* TODO: How about freeing the list elements and the strings? */
-    /* Free queue structure */
-    /* Add */
+    if (q->head == q->tail) {
+        free(q->head->value);
+        free(q->head);
+    } else {
+        while (q->head != NULL) {
+            q->tail = q->head;
+            q->head = q->head->next;
+            free(q->tail->value);
+            free(q->tail);
+        }
+    }
     free(q);
 }
 
@@ -53,7 +60,7 @@ bool q_insert_head(queue_t *q, char *s)
         char *input;
         size_t string_size;
         string_size = strlen(s);
-        input = malloc(string_size);
+        input = malloc(string_size + 1);
         if (input == NULL) {
             free(newh);
             return false;
@@ -93,7 +100,7 @@ bool q_insert_tail(queue_t *q, char *s)
         char *input;
         size_t string_size;
         string_size = strlen(s);
-        input = malloc(string_size);
+        input = malloc(string_size + 1);
         if (input == NULL) {
             free(newt);
             return false;
