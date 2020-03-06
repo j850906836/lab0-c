@@ -48,10 +48,16 @@ bool q_insert_head(queue_t *q, char *s)
         return false;
     } else {
         newh = malloc(sizeof(list_ele_t));
+        if (newh == NULL)
+            return false;
         char *input;
         size_t string_size;
         string_size = strlen(s);
         input = malloc(string_size);
+        if (input == NULL) {
+            free(newh);
+            return false;
+        }
         int i;
         for (i = 0; s[i] != '\0'; i++) {
             input[i] = s[i];
@@ -76,13 +82,37 @@ bool q_insert_head(queue_t *q, char *s)
  */
 bool q_insert_tail(queue_t *q, char *s)
 {
-    /* TODO: You need to write the complete code for this function */
-    /* Remember: It should operate in O(1) time */
-    /* TODO: Remove the above comment when you are about to implement. */
     list_ele_t *newt;
-    newt = malloc(sizeof(list_ele_t));
-    q->tail = newt;
-    return true;
+    if (q == NULL) {
+        printf("queue is NULL\n");
+        return false;
+    } else {
+        newt = malloc(sizeof(list_ele_t));
+        if (newt == NULL)
+            return false;
+        char *input;
+        size_t string_size;
+        string_size = strlen(s);
+        input = malloc(string_size);
+        if (input == NULL) {
+            free(newt);
+            return false;
+        }
+        int i;
+        for (i = 0; s[i] != '\0'; i++) {
+            input[i] = s[i];
+        }
+        input[i] = '\0';
+        newt->value = input;
+        newt->next = NULL;
+        if (q->head == NULL && q->tail == NULL)
+            q->head = q->tail = newt;
+        else {
+            q->tail->next = newt;
+            q->tail = newt;
+        }
+        return true;
+    }
 }
 
 /*
