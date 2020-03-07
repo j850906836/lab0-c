@@ -10,22 +10,25 @@
  * Create empty queue.
  * Return NULL if could not allocate space.
  */
+int length = 0;
 queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
     if (q == NULL) {
-        printf("No Enough Space\n");
+        return NULL;
     } else { /* What if malloc returned NULL? */
         q->head = NULL;
         q->tail = NULL;
+        return q;
     }
-    return q;
 }
 
 /* Free all storage used by queue */
 void q_free(queue_t *q)
 {
-    if (q->head == q->tail) {
+    if (q == NULL)
+        return;
+    else if (q->head == q->tail) {
         free(q->head->value);
         free(q->head);
     } else {
@@ -47,6 +50,7 @@ bool q_insert_head(queue_t *q, char *s)
         printf("queue is NULL\n");
         return false;
     } else {
+        length++;
         newh = malloc(sizeof(list_ele_t));
         if (newh == NULL)
             return false;
@@ -77,9 +81,9 @@ bool q_insert_tail(queue_t *q, char *s)
 {
     list_ele_t *newt;
     if (q == NULL) {
-        printf("queue is NULL\n");
         return false;
     } else {
+        length++;
         newt = malloc(sizeof(list_ele_t));
         if (newt == NULL)
             return false;
@@ -120,9 +124,10 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* TODO: You need to fix up this code. */
     /* TODO: Remove the above comment when you are about to implement. */
-    if (q == NULL || q->head->value == NULL)
+    if (q == NULL || q->head->value == NULL || sp == NULL)
         return false;
     else {
+        length--;
         size_t i;
         char *tmp;
         list_ele_t *link;
@@ -151,14 +156,14 @@ int q_size(queue_t *q)
 {
     if (q == NULL || q->head->value == NULL)
         return false;
-    else {
-        int size = 0;
-        list_ele_t *tmp = q->head;
-        while (tmp->next != NULL) {
-            size++;
-            tmp = tmp->next;
-        }
-        return size + 1;
+    else { /*
+         int size = 0;
+         list_ele_t *tmp = q->head;
+         while (tmp->next != NULL) {
+             size++;
+             tmp = tmp->next;
+         }*/
+        return length;
     }
 }
 
@@ -171,7 +176,7 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    if (q != NULL) {
+    if (q != NULL && q->head->value != NULL) {
         list_ele_t *tmp = q->head, *tmp_end;
         int qsize = q_size(q) - 1;
         tmp_end = q->tail;
@@ -195,6 +200,38 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
+    if (q == NULL || q->head->value == NULL)
+        return;
+    else if (q->head == q->tail)
+        return;
+    else {
+        int size = q_size(q);
+        list_ele_t *tmp, *curr, *prev;
+        for (int i = size; i > 0; i--) {
+            curr = prev = q->head;
+            for (int j = 0; j < i - 1 && curr->next; j++) {
+                if (strcmp(curr->value, curr->next->value) > 0) {
+                    tmp = curr->next;
+                    curr->next = tmp->next;
+                    tmp->next = curr;
+                    if (curr == q->head) {
+                        q->head = tmp;
+                        prev = tmp;
+                    } else {
+                        prev->next = tmp;
+                        prev = prev->next;
+                    }
+                } else {
+                    curr = curr->next;
+                    if (j != 0)
+                        prev = prev->next;
+                }
+            }
+        }
+        //    free(tmp);
+        //    free(curr);
+        //    free(prev);
+    }
     /* TODO: You need to write the code for this function */
     /* TODO: Remove the above comment when you are about to implement. */
 }
