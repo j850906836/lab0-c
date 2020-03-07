@@ -39,13 +39,6 @@ void q_free(queue_t *q)
     free(q);
 }
 
-/*
- * Attempt to insert element at head of queue.
- * Return true if successful.
- * Return false if q is NULL or could not allocate space.
- * Argument s points to the string to be stored.
- * The function must explicitly allocate space and copy the string into it.
- */
 bool q_insert_head(queue_t *q, char *s)
 {
     list_ele_t *newh;
@@ -80,13 +73,6 @@ bool q_insert_head(queue_t *q, char *s)
     }
 }
 
-/*
- * Attempt to insert element at tail of queue.
- * Return true if successful.
- * Return false if q is NULL or could not allocate space.
- * Argument s points to the string to be stored.
- * The function must explicitly allocate space and copy the string into it.
- */
 bool q_insert_tail(queue_t *q, char *s)
 {
     list_ele_t *newt;
@@ -134,8 +120,27 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* TODO: You need to fix up this code. */
     /* TODO: Remove the above comment when you are about to implement. */
-    q->head = q->head->next;
-    return true;
+    if (q == NULL || q->head->value == NULL)
+        return false;
+    else {
+        size_t i;
+        char *tmp;
+        list_ele_t *link;
+        tmp = q->head->value;
+        for (i = 0; tmp[i] != '\0'; i++) {
+            sp[i] = tmp[i];
+            if (i == bufsize - 1) {
+                i++;
+                break;
+            }
+        }
+        sp[i] = '\0';
+        link = q->head;
+        q->head = q->head->next;
+        free(link->value);
+        free(link);
+        return true;
+    }
 }
 
 /*
