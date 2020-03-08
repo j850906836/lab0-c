@@ -14,7 +14,8 @@ int length = 0;
 queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
-    if (q == NULL) {
+    if (q == NULL && (sizeof(queue_t) > 0)) {
+        printf("malloc fail");
         return NULL;
     } else { /* What if malloc returned NULL? */
         q->head = NULL;
@@ -28,9 +29,12 @@ void q_free(queue_t *q)
 {
     if (q == NULL)
         return;
-    else if (q->head == q->tail) {
+    else if (length == 1) {
         free(q->head->value);
         free(q->head);
+        free(q);
+    } else if (length == 0) {
+        free(q);
     } else {
         while (q->head != NULL) {
             q->tail = q->head;
@@ -38,10 +42,17 @@ void q_free(queue_t *q)
             free(q->tail->value);
             free(q->tail);
         }
+        free(q);
     }
-    free(q);
 }
 
+/*
+ * Attempt to insert element at head of queue.
+ * Return true if successful.
+ * Return false if q is NULL or could not allocate space.
+ * Argument s points to the string to be stored.
+ * The function must explicitly allocate space and copy the string into it.
+ */
 bool q_insert_head(queue_t *q, char *s)
 {
     list_ele_t *newh;
@@ -77,6 +88,13 @@ bool q_insert_head(queue_t *q, char *s)
     }
 }
 
+/*
+ * Attempt to insert element at tail of queue.
+ * Return true if successful.
+ * Return false if q is NULL or could not allocate space.
+ * Argument s points to the string to be stored.
+ * The function must explicitly allocate space and copy the string into it.
+ */
 bool q_insert_tail(queue_t *q, char *s)
 {
     list_ele_t *newt;
@@ -124,9 +142,9 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
     /* TODO: You need to fix up this code. */
     /* TODO: Remove the above comment when you are about to implement. */
-    if (q == NULL || q->head->value == NULL || sp == NULL)
+    if (length == 0 || q == NULL || q->head->value == NULL || sp == NULL) {
         return false;
-    else {
+    } else {
         length--;
         size_t i;
         char *tmp;
@@ -134,7 +152,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
         tmp = q->head->value;
         for (i = 0; tmp[i] != '\0'; i++) {
             sp[i] = tmp[i];
-            if (i == bufsize - 1) {
+            if (i == bufsize - 2) {
                 i++;
                 break;
             }
@@ -154,17 +172,10 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
  */
 int q_size(queue_t *q)
 {
-    if (q == NULL || q->head->value == NULL)
+    if (q == NULL || length == 0)
         return false;
-    else { /*
-         int size = 0;
-         list_ele_t *tmp = q->head;
-         while (tmp->next != NULL) {
-             size++;
-             tmp = tmp->next;
-         }*/
+    else
         return length;
-    }
 }
 
 /*
@@ -176,7 +187,19 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    if (q != NULL && q->head->value != NULL) {
+    if (q != NULL && length > 0) {
+        list_ele_t *prev = NULL, *curr, *next = NULL, *tmp;
+        tmp = curr = q->head;
+        while (curr != NULL) {
+            next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        q->tail = tmp;
+        q->head = prev;
+
+        /*
         list_ele_t *tmp = q->head, *tmp_end;
         int qsize = q_size(q) - 1;
         tmp_end = q->tail;
@@ -189,7 +212,7 @@ void q_reverse(queue_t *q)
             qsize--;
         }
         q->head = tmp_end;
-        q->tail->next = NULL;
+        q->tail->next = NULL;*/
     }
 }
 
@@ -200,9 +223,9 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    if (q == NULL || q->head->value == NULL)
+    if (q == NULL || length == 0)
         return;
-    else if (q->head == q->tail)
+    else if (length == 1)
         return;
     else {
         int size = q_size(q);
@@ -228,10 +251,5 @@ void q_sort(queue_t *q)
                 }
             }
         }
-        //    free(tmp);
-        //    free(curr);
-        //    free(prev);
     }
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
 }
