@@ -1,4 +1,11 @@
 personal_ws-1.1 en 500
+usr
+lib
+sbin
+env
+bash
+etc
+var
 dudect
 runtime
 todo
@@ -120,3 +127,4 @@ setjmp
 signal
 srand
 sscanf
+macOS
