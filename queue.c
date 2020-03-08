@@ -225,9 +225,21 @@ list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
     // merge with pseudo node
     list_ele_t *temp = NULL;
     list_ele_t **p = &temp;
-
+    int cmp;
+    char *a = NULL, *b = NULL;
     while (l1 && l2) {
-        if (strcasecmp(l1->value, l2->value) <= 0) {
+        a = l1->value;
+        b = l2->value;
+        cmp = 0;
+        while (a[cmp] == b[cmp])
+            cmp++;
+        if (strlen(a) == strlen(b) && cmp == strlen(a))
+            cmp = 0;
+        else if (a[cmp] < b[cmp])
+            cmp = -1;
+        else
+            cmp = 1;
+        if (cmp <= 0) {
             *p = l1;
             l1 = l1->next;
         } else {
