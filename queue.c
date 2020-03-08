@@ -30,6 +30,7 @@ void q_free(queue_t *q)
     if (q == NULL)
         return;
     else if (length == 1) {
+        length = 0;
         free(q->head->value);
         free(q->head);
         free(q);
@@ -42,6 +43,7 @@ void q_free(queue_t *q)
             free(q->tail->value);
             free(q->tail);
         }
+        length = 0;
         free(q);
     }
 }
@@ -198,21 +200,6 @@ void q_reverse(queue_t *q)
         }
         q->tail = tmp;
         q->head = prev;
-
-        /*
-        list_ele_t *tmp = q->head, *tmp_end;
-        int qsize = q_size(q) - 1;
-        tmp_end = q->tail;
-        while (qsize) {
-            while (tmp->next != q->tail)
-                tmp = tmp->next;
-            q->tail->next = tmp;
-            q->tail = tmp;
-            tmp = q->head;
-            qsize--;
-        }
-        q->head = tmp_end;
-        q->tail->next = NULL;*/
     }
 }
 
@@ -223,33 +210,100 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    if (q == NULL || length == 0)
-        return;
-    else if (length == 1)
+    if (q == NULL || length <= 1)
         return;
     else {
-        int size = q_size(q);
-        list_ele_t *tmp, *curr, *prev;
-        for (int i = size; i > 0; i--) {
-            curr = prev = q->head;
-            for (int j = 0; j < i - 1 && curr->next; j++) {
-                if (strcmp(curr->value, curr->next->value) > 0) {
-                    tmp = curr->next;
-                    curr->next = tmp->next;
-                    tmp->next = curr;
-                    if (curr == q->head) {
-                        q->head = tmp;
-                        prev = tmp;
-                    } else {
-                        prev->next = tmp;
-                        prev = prev->next;
-                    }
-                } else {
-                    curr = curr->next;
-                    if (j != 0)
-                        prev = prev->next;
-                }
-            }
-        }
+        q->head = mergeSortList(q->head);
+        list_ele_t *tmp = q->head;
+        while (tmp->next)
+            tmp = tmp->next;
+        q->tail = tmp;
     }
 }
+list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
+{
+    // merge with pseudo node
+    list_ele_t *temp = NULL;
+    list_ele_t **p = &temp;
+
+    while (l1 && l2) {
+        if (strcasecmp(l1->value, l2->value) <= 0) {
+            *p = l1;
+            l1 = l1->next;
+        } else {
+            *p = l2;
+            l2 = l2->next;
+        }
+        p = &(*p)->next;
+    }
+
+    if (l1)
+        *p = l1;
+    if (l2)
+        *p = l2;
+
+    return temp;
+}
+
+list_ele_t *mergeSortList(list_ele_t *head)
+{
+    // merge sort
+    if (!head || !head->next) {
+        return head;
+    }
+    list_ele_t *fast = head->next;
+    list_ele_t *slow = head;
+    // split list
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
+    fast = slow->next;
+    slow->next = NULL;
+    // sort each list
+    head = mergeSortList(head);
+    fast = mergeSortList(fast);
+    //     list_ele_t* l1 = mergeSortList(head);
+    //     list_ele_t* l2 = mergeSortList(fast);
+    // merge sorted l1 and sorted l2
+    return merge(head, fast);
+}
+/*
+list_ele_t* merge (list_ele_t* l1, list_ele_t* l2) {
+    // merge with recursive
+        if(!l2)
+            return l1;
+        if(!l1)
+            return l2;
+        if(strcasecmp( l1->value ,l2->value) <= 0) {
+            l1->next = merge(l1->next, l2);
+            return l1;
+        }
+        else {
+            l2->next = merge(l1, l2->next);
+            return l2;
+        }
+    }
+
+list_ele_t* mergeSortList (list_ele_t* head) {
+        // merge sort
+        if(!head || !head->next) {
+            return head;
+        }
+        list_ele_t* fast = head->next;
+        list_ele_t* slow = head;
+        // split list
+        while(fast && fast->next) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        fast = slow->next;
+        slow->next = NULL;
+        // sort each list
+        head = mergeSortList(head);
+        fast = mergeSortList(fast);
+   //     list_ele_t* l1 = mergeSortList(head);
+   //     list_ele_t* l2 = mergeSortList(fast);
+        // merge sorted l1 and sorted l2
+        return merge(head, fast);
+}*/
