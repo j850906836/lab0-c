@@ -142,8 +142,6 @@ bool q_insert_tail(queue_t *q, char *s)
  */
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
-    /* TODO: You need to fix up this code. */
-    /* TODO: Remove the above comment when you are about to implement. */
     if (length == 0 || q == NULL || q->head->value == NULL || sp == NULL) {
         return false;
     } else {
@@ -214,10 +212,10 @@ void q_sort(queue_t *q)
         return;
     else {
         q->head = mergeSortList(q->head);
-        //    list_ele_t *tmp = q->head;
-        //    while (tmp->next)
-        //        tmp = tmp->next;
-        //   q->tail = tmp;
+        list_ele_t *tmp = q->head;
+        while (tmp->next)
+            tmp = tmp->next;
+        q->tail = tmp;
     }
 }
 list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
@@ -227,7 +225,7 @@ list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
     list_ele_t **p = &temp;
 
     while (l1 && l2) {
-        if (natur_cmp(l1->value, l2->value) < 0) {
+        if (natur_cmp(l1->value, l2->value) <= 0) {
             *p = l1;
             l1 = l1->next;
         } else {
@@ -270,38 +268,45 @@ int natur_cmp(char *a, char *b)
 {
     if (strcasecmp(a, b) == 0)
         return 0;
-    int i = 0, dig_numa = 0, dig_numb = 0;
-    while (1) {
-        while (a[i] == b[i] && !isdigit(a[i]) && !isdigit(b[i]))
-            i++;
-        while (isdigit(a[i])) {
-            i++;
-            dig_numa++;
-        }
-        i -= dig_numa;
-        while (isdigit(b[i])) {
-            i++;
-            dig_numb++;
-        }
-        i -= dig_numb;
-        if (atof(a + i) > atof(b + i))
-            return 1;
-        else if (atof(a + i) < atof(b + i))
-            return -1;
-        else if (atof(a + i) == atof(b + i)) {
-            if (dig_numa == 0) {
-                return strcasecmp(a, b);
-            } else {
-                if (dig_numa > dig_numb)
-                    return 1;
-                else if (dig_numa < dig_numb)
-                    return -1;
-                else if (dig_numa == dig_numb) {
-                    i += dig_numa;
-                    dig_numa = 0;
-                    dig_numb = 0;
-                } else
-                    return 0;
+    else {
+        int i = 0, dig_numa = 0, dig_numb = 0;
+        while (1) {
+            while (a[i] == b[i] && !isdigit(a[i]) && !isdigit(b[i]))
+                i++;
+            while (isdigit(a[i])) {
+                i++;
+                dig_numa++;
+            }
+            i -= dig_numa;
+            while (isdigit(b[i])) {
+                i++;
+                dig_numb++;
+            }
+            i -= dig_numb;
+            if (dig_numa > dig_numb)
+                return 1;
+            else if (dig_numb > dig_numa)
+                return -1;
+            else if (dig_numa == dig_numb) {
+                if (dig_numa == 0) {
+                    return strcasecmp(a, b);
+                } else {
+                    int j = dig_numa + i;
+                    for (; i < j; i++) {
+                        if (a[i] > b[i])
+                            return 1;
+                        else if (a[i] < b[i])
+                            return -1;
+                        else
+                            continue;
+                    }
+                    if (strlen(a) > dig_numa) {
+                        dig_numa = 0;
+                        dig_numb = 0;
+                        i++;
+                    } else
+                        return 0;
+                }
             }
         }
     }
