@@ -16,7 +16,6 @@ queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
     if (q == NULL && (sizeof(queue_t) > 0)) {
-        printf("malloc fail");
         return NULL;
     } else { /* What if malloc returned NULL? */
         q->head = NULL;
@@ -215,10 +214,10 @@ void q_sort(queue_t *q)
         return;
     else {
         q->head = mergeSortList(q->head);
-        list_ele_t *tmp = q->head;
-        while (tmp->next)
-            tmp = tmp->next;
-        q->tail = tmp;
+        //    list_ele_t *tmp = q->head;
+        //    while (tmp->next)
+        //        tmp = tmp->next;
+        //   q->tail = tmp;
     }
 }
 list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
@@ -228,7 +227,7 @@ list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
     list_ele_t **p = &temp;
 
     while (l1 && l2) {
-        if (natur_cmp(l1->value, l2->value) <= 0) {
+        if (natur_cmp(l1->value, l2->value) < 0) {
             *p = l1;
             l1 = l1->next;
         } else {
@@ -264,14 +263,13 @@ list_ele_t *mergeSortList(list_ele_t *head)
     // sort each list
     head = mergeSortList(head);
     fast = mergeSortList(fast);
-    //     list_ele_t* l1 = mergeSortList(head);
-    //     list_ele_t* l2 = mergeSortList(fast);
-    // merge sorted l1 and sorted l2
     return merge(head, fast);
 }
 
 int natur_cmp(char *a, char *b)
 {
+    if (strcasecmp(a, b) == 0)
+        return 0;
     int i = 0, dig_numa = 0, dig_numb = 0;
     while (1) {
         while (a[i] == b[i] && !isdigit(a[i]) && !isdigit(b[i]))
@@ -286,27 +284,22 @@ int natur_cmp(char *a, char *b)
             dig_numb++;
         }
         i -= dig_numb;
-        if (dig_numa > dig_numb)
+        if (atof(a + i) > atof(b + i))
             return 1;
-        else if (dig_numb > dig_numa)
+        else if (atof(a + i) < atof(b + i))
             return -1;
-        else if (dig_numa == dig_numb) {
+        else if (atof(a + i) == atof(b + i)) {
             if (dig_numa == 0) {
                 return strcasecmp(a, b);
             } else {
-                int j = dig_numa + i;
-                for (; i < j; i++) {
-                    if (a[i] > b[i])
-                        return 1;
-                    else if (a[i] < b[i])
-                        return -1;
-                    else
-                        continue;
-                }
-                if (strlen(a) > dig_numa) {
+                if (dig_numa > dig_numb)
+                    return 1;
+                else if (dig_numa < dig_numb)
+                    return -1;
+                else if (dig_numa == dig_numb) {
+                    i += dig_numa;
                     dig_numa = 0;
                     dig_numb = 0;
-                    i++;
                 } else
                     return 0;
             }
@@ -314,42 +307,3 @@ int natur_cmp(char *a, char *b)
     }
     return false;
 }
-/*
-list_ele_t* merge (list_ele_t* l1, list_ele_t* l2) {
-    // merge with recursive
-        if(!l2)
-            return l1;
-        if(!l1)
-            return l2;
-        if(strcasecmp( l1->value ,l2->value) <= 0) {
-            l1->next = merge(l1->next, l2);
-            return l1;
-        }
-        else {
-            l2->next = merge(l1, l2->next);
-            return l2;
-        }
-    }
-
-list_ele_t* mergeSortList (list_ele_t* head) {
-        // merge sort
-        if(!head || !head->next) {
-            return head;
-        }
-        list_ele_t* fast = head->next;
-        list_ele_t* slow = head;
-        // split list
-        while(fast && fast->next) {
-            slow = slow->next;
-            fast = fast->next->next;
-        }
-        fast = slow->next;
-        slow->next = NULL;
-        // sort each list
-        head = mergeSortList(head);
-        fast = mergeSortList(fast);
-   //     list_ele_t* l1 = mergeSortList(head);
-   //     list_ele_t* l2 = mergeSortList(fast);
-        // merge sorted l1 and sorted l2
-        return merge(head, fast);
-}*/
