@@ -11,7 +11,7 @@
  * Create empty queue.
  * Return NULL if could not allocate space.
  */
-int length = 0;
+
 queue_t *q_new()
 {
     queue_t *q = malloc(sizeof(queue_t));
@@ -20,6 +20,7 @@ queue_t *q_new()
     } else { /* What if malloc returned NULL? */
         q->head = NULL;
         q->tail = NULL;
+        q->size = 0;
         return q;
     }
 }
@@ -29,12 +30,12 @@ void q_free(queue_t *q)
 {
     if (q == NULL)
         return;
-    else if (length == 1) {
-        length = 0;
+    else if (q->size == 1) {
+        q->size = 0;
         free(q->head->value);
         free(q->head);
         free(q);
-    } else if (length == 0) {
+    } else if (q->size == 0) {
         free(q);
     } else {
         while (q->head != NULL) {
@@ -42,8 +43,8 @@ void q_free(queue_t *q)
             q->head = q->head->next;
             free(q->tail->value);
             free(q->tail);
+            q->size--;
         }
-        length = 0;
         free(q);
     }
 }
@@ -63,7 +64,7 @@ bool q_insert_head(queue_t *q, char *s)
         printf("queue is NULL\n");
         return false;
     } else {
-        length++;
+        q->size++;
         newh = malloc(sizeof(list_ele_t));
         if (newh == NULL)
             return false;
@@ -103,7 +104,7 @@ bool q_insert_tail(queue_t *q, char *s)
     if (q == NULL) {
         return false;
     } else {
-        length++;
+        q->size++;
         newt = malloc(sizeof(list_ele_t));
         if (newt == NULL)
             return false;
@@ -142,10 +143,12 @@ bool q_insert_tail(queue_t *q, char *s)
  */
 bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
 {
-    if (length == 0 || q == NULL || q->head->value == NULL || sp == NULL) {
+    if (q == NULL)
+        return false;
+    else if (q->size == 0 || q->head->value == NULL || sp == NULL) {
         return false;
     } else {
-        length--;
+        q->size--;
         size_t i;
         char *tmp;
         list_ele_t *link;
@@ -172,10 +175,10 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
  */
 int q_size(queue_t *q)
 {
-    if (q == NULL || length == 0)
+    if (q == NULL || q->size == 0)
         return false;
     else
-        return length;
+        return q->size;
 }
 
 /*
@@ -187,7 +190,7 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    if (q != NULL && length > 0) {
+    if (q != NULL && q->size > 0) {
         list_ele_t *prev = NULL, *curr, *next = NULL, *tmp;
         tmp = curr = q->head;
         while (curr != NULL) {
@@ -208,7 +211,7 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    if (q == NULL || length <= 1)
+    if (q == NULL || q->size <= 1)
         return;
     else {
         q->head = mergeSortList(q->head);
