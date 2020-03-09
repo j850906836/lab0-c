@@ -1,5 +1,6 @@
 #include "queue.h"
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -225,21 +226,9 @@ list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
     // merge with pseudo node
     list_ele_t *temp = NULL;
     list_ele_t **p = &temp;
-    int cmp;
-    char *a = NULL, *b = NULL;
+
     while (l1 && l2) {
-        a = l1->value;
-        b = l2->value;
-        cmp = 0;
-        while (a[cmp] == b[cmp])
-            cmp++;
-        if (strlen(a) == strlen(b) && cmp == strlen(a))
-            cmp = 0;
-        else if (a[cmp] < b[cmp])
-            cmp = -1;
-        else
-            cmp = 1;
-        if (cmp <= 0) {
+        if (natur_cmp(l1->value, l2->value) <= 0) {
             *p = l1;
             l1 = l1->next;
         } else {
@@ -279,6 +268,51 @@ list_ele_t *mergeSortList(list_ele_t *head)
     //     list_ele_t* l2 = mergeSortList(fast);
     // merge sorted l1 and sorted l2
     return merge(head, fast);
+}
+
+int natur_cmp(char *a, char *b)
+{
+    int i = 0, dig_numa = 0, dig_numb = 0;
+    while (1) {
+        while (a[i] == b[i] && !isdigit(a[i]) && !isdigit(b[i]))
+            i++;
+        while (isdigit(a[i])) {
+            i++;
+            dig_numa++;
+        }
+        i -= dig_numa;
+        while (isdigit(b[i])) {
+            i++;
+            dig_numb++;
+        }
+        i -= dig_numb;
+        if (dig_numa > dig_numb)
+            return 1;
+        else if (dig_numb > dig_numa)
+            return -1;
+        else if (dig_numa == dig_numb) {
+            if (dig_numa == 0) {
+                return strcasecmp(a, b);
+            } else {
+                int j = dig_numa + i;
+                for (; i < j; i++) {
+                    if (a[i] > b[i])
+                        return 1;
+                    else if (a[i] < b[i])
+                        return -1;
+                    else
+                        continue;
+                }
+                if (strlen(a) > dig_numa) {
+                    dig_numa = 0;
+                    dig_numb = 0;
+                    i++;
+                } else
+                    return 0;
+            }
+        }
+    }
+    return false;
 }
 /*
 list_ele_t* merge (list_ele_t* l1, list_ele_t* l2) {
