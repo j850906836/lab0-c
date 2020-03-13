@@ -187,7 +187,17 @@ int q_size(queue_t *q)
  */
 void q_reverse(queue_t *q)
 {
-    if (q != NULL && q->size > 0) {
+    if (q && q->size > 0) {
+        list_ele_t *curr, *next;
+        q->tail = curr = q->head;
+        while (curr != NULL) {
+            next = curr->next;
+            curr->next = q->head;
+            q->head = curr;
+            curr = next;
+        }
+        q->tail->next = NULL;
+        /*
         list_ele_t *prev = NULL, *curr, *next = NULL, *tmp;
         tmp = curr = q->head;
         while (curr != NULL) {
@@ -198,6 +208,7 @@ void q_reverse(queue_t *q)
         }
         q->tail = tmp;
         q->head = prev;
+        */
     }
 }
 
