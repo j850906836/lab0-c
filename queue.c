@@ -175,10 +175,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
  */
 int q_size(queue_t *q)
 {
-    if (q == NULL || q->size == 0)
-        return false;
-    else
-        return q->size;
+    return q ? q->size : 0;
 }
 
 /*
