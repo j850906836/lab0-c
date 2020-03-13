@@ -197,18 +197,6 @@ void q_reverse(queue_t *q)
             curr = next;
         }
         q->tail->next = NULL;
-        /*
-        list_ele_t *prev = NULL, *curr, *next = NULL, *tmp;
-        tmp = curr = q->head;
-        while (curr != NULL) {
-            next = curr->next;
-            curr->next = prev;
-            prev = curr;
-            curr = next;
-        }
-        q->tail = tmp;
-        q->head = prev;
-        */
     }
 }
 
@@ -221,13 +209,11 @@ void q_sort(queue_t *q)
 {
     if (q == NULL || q->size <= 1)
         return;
-    else {
-        q->head = mergeSortList(q->head);
-        list_ele_t *tmp = q->head;
-        while (tmp->next)
-            tmp = tmp->next;
-        q->tail = tmp;
-    }
+    q->head = mergeSortList(q->head);
+    list_ele_t *tmp;
+    for (tmp = q->head; tmp->next; tmp = tmp->next)
+        ;
+    q->tail = tmp;
 }
 list_ele_t *merge(list_ele_t *l1, list_ele_t *l2)
 {
